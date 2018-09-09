@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="http://code.jquery.com/jquery-latest.min.js"
+        type="text/javascript"></script>
+    </head>
+    <body>
+            <main>
+                <div id="stats">
+                    <header><h2>Stat Mago</h2></header>
+                    <div>
+                        <label><strong>Gnosi Mago</strong></label>
+                        <input type="number" id="gnosiM" name="gnosiM"/>
+                    </div>
+                    <div>
+                        <label><strong>Livello Arcanum</strong></label>
+                        <input type="number" id="arcanumM" name="arcanumM"/>
+                    </div>
+                    <header><h2>Stat incantesimo</h2></header>
+                    <div>
+                        <label><strong>Livello Minimo</strong></label>
+                        <input type="number" id="minLvlI" name="minLvlI"/>
+                    </div>
+                    <div>
+                        <label><strong>Durata incantesimo</strong></label>
+                        <select id="durataI" name="durataI">
+                            <option value='ins'>Istantanea</option>
+                            <option value='trn'>Transitoria</option>
+                            <option value='ext'>Estesa</option>
+                            <option value='cnc'>Concentrazione</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="spell">
+                    <header><h2>Modificatori incantesimo</h2></header>
+                    <h3 id="advM"></h3>
+                    <div>
+                        <label><strong>Potenza incantesimo</strong></label>
+                        <input type="number" id="potenzaM" name="potenzaM"/>
+                    </div>
+                    <div>
+                        <label><strong>Numero di bersagli</strong></label>
+                        <input type="number" id="bersagliM" name="bersagliM"/>
+                    </div>
+                    <div>
+                        <label><strong>Taglia massima del bersaglio</strong></label>
+                        <input type="number" id="tagliaM" name="tagliaM"/>
+                    </div>
+                    <div>
+                        <label><strong>Raggio dell'incantesimo</strong></label>
+                        <input type="number" id="raggioM" name="raggioM"/> metri
+                    </div>
+                    <div>
+                        <label><strong>Volume dell'incantesimo</strong></label>
+                        <input type="number" id="volumeM" name="volumeM"/> metri cubi
+                    </div>
+                    <div>
+                        <label><strong>Durata dell'incantesimo</strong></label>
+                        <select id="durataMtrn" name="durataMtrn" class="durataM" style="display:none;">
+                            <option value="0" selected="selected">1</option>
+							<option value="1">2</option>
+							<option value="2">3</option>
+							<option value="3">5</option>
+							<option value="4">10</option>
+							<option value="5">20</option>
+                        </select>
+                        <select id="durataMext" name="durataMext" class="durataM" style="display:none;">
+                                <option value="0" selected="selected">1 ora</option>
+                                <option value="1">2 ore</option>
+                                <option value="2">12 ore</option>
+                                <option value="3">24 ore</option>
+                                <option value="4">2 giorni</option>
+                                <option value="5">4 giorni</option>
+                        </select>
+                        <select id="durataMextADV" name="durataMextADV" class="durataM" style="display:none;">
+                                <option value="0" selected="selected">1 ora</option>
+                                <option value="1">24 ore</option>
+                                <option value="2">2 giorni</option>
+                                <option value="3">1 settimana</option>
+                                <option value="4">1 mese</option>
+                                <option value="5">Indefinita</option>
+                        </select>
+                        <span id="durataMins" class="durataM"><strong> Istantanea</strong></span>
+                        <span id="durataMcnc" class="durataM" style="display:none;"><strong> Concentrazione</strong></span>
+                    </div>
+		</div>
+                <div id="result">
+                    <h1>Numero totale di turni del rituale</h1>
+                    <strong id="risultato">Compilare tutti i campi obbligatori</strong>
+                </div>
+            
+            </main>
+        <script type="text/javascript">
+            $(":input").change(
+                function (){
+                    $(document).data('advM',0);
+                    if($("#gnosiM").val()>0 && $("#arcanumM").val()>0 && $("#minLvlI").val()>0){
+                        if($("#arcanumM").val()>$("#minLvlI").val()){
+                            $(document).data('advM',1);
+                        }
+			var total=1;
+                        if($("#potenzaM").val()>0){
+                            total+=$("#potenzaM").val()-1;
+                        }
+                        if($("#bersagliM").val()>1){
+                            total+= Math.ceil(Math.log($("#bersagliM").val()) * Math.LOG2E);
+                        }
+                        if($("#tagliaM").val()>20){
+                            total+=Math.ceil($("#tagliaM").val()/10)-2;
+                        }
+                        if($("#raggioM").val()>1){
+                            if($(document).data('advM')!=1){
+                                total+= Math.ceil(Math.log($("#raggioM").val()) * Math.LOG2E);
+                            }else{
+                                total+= Math.ceil(Math.log($("#raggioM").val()) * Math.log(4));
+                            }
+                        }
+                        if($("#volumeM").val()>1){
+                            if($(document).data('advM')!=1){
+                                total+= Math.ceil(Math.log($("#volumeM").val()/5) * Math.LOG2E);
+                            }else{
+                                total+= Math.ceil(Math.log($("#volumeM").val()/5) * Math.log(4));
+                            }
+                        }
+                        if($("#durataI").val()=='trn'){
+                                    total+= $("#durataMtrn").val();
+                        }else if($("#durataI").val()=='ext'){
+                            if($(document).data('advM')!=1){
+                                    total+=$("#durataMext").val();
+                            }else{
+                                    total+=$("#durataMextADV").val();
+                            }
+                        }
+                        if($("#arcanumM").val()<$("#minLvlI").val()){
+                            $("#risultato").html("Livello arcanum non sufficiente al lancio dell'incantesimo");
+                        }else{
+                            $("#risultato").html(total);
+                        }
+                    }else{
+                        $("#risultato").html("Compilare tutti i campi obbligatori");
+                    }
+                    if($(document).data('advM')!=1){
+                        $("#advM").html("");
+                    }else{
+                        $("#advM").html("Fattori avanzati attivi");
+                    }
+                }
+            );
+            $("#durataI").change(
+                    function (){
+                            $(".durataM").hide();
+                            if($("#durataI").val()=='trn'){
+                                    $("#durataMtrn").show();
+                            }else if($("#durataI").val()=='ext'){
+                                if($(document).data('advM')!=1){
+                                        $("#durataMext").show();
+                                }else{
+                                        $("#durataMextADV").show();
+                                }
+                            }else if($("#durataI").val()=='ins'){
+                                $("#durataMins").show();
+                            }else if($("#durataI").val()=='cnc'){
+                                $("#durataMcnc").show();
+                            }
+                    }
+            );
+        </script>
+    </body>
+</html>
